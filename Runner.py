@@ -36,6 +36,7 @@ def analyse_crime_data():
     size_hidden = 6
     all_factors = Load_NeuralNetwork(all_factors_X, total_crimes_scaled, lr, size_hidden, size_output)
     #Compare variables
+    print("")
     print("==== Impact of the percentage of the population who drink alcohol at risky levels on crimes: ====\n")
     alcohol_impact.train_and_observe_results(epochs, verbose)
     print("==== Impact of the percentage of the population that didn't finish year 9 on crimes: ====\n")
