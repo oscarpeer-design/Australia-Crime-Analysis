@@ -91,24 +91,47 @@ def standardise(values):
     return [(x-mean)/std for x in values]
 
 def standardise_values(data):
-    for values in data:
-        values = standardise(values)
+    for i in range(len(data)):
+        data[i] = standardise(data[i])
     return data
 
-def UseExtract_Excel(spreadsheet_name, workbook_name, column_names, remove_headings, keep_first_column, sort = True, standardisation = True):
+def UseExtract_Excel(
+    spreadsheet_name,
+    workbook_name,
+    column_names,
+    remove_headings,
+    keep_first_column,
+    sort=True,
+    standardisation=True
+):
     etl = Extract_EXCEL(spreadsheet_name, workbook_name)
     etl.open_main_workbook()
     etl.read_sheet_columns(column_names)
-    if etl.data_is_read():
-        if remove_headings is True:
-            data = etl.get_data()
-            data = remove_column_headings(data, keep_first_column)
-        if sort is True:
-           data = sort_data(data)
-        if standardisation is True:
-            data = standardise_values(data[1:])
-        return data
-    return None
+
+    if not etl.data_is_read():
+        return None
+
+    # Always initialise data first
+    data = etl.get_data()
+
+    # Remove headings if requested
+    if remove_headings:
+        data = remove_column_headings(data, keep_first_column)
+
+    # Sort columns if requested
+    if sort:
+        data = sort_data(data)
+
+    # Standardise numeric columns if requested
+    if standardisation:
+        if keep_first_column:
+            first_column = data[0]
+            remaining_columns = standardise_values(data[1:])
+            data = [first_column] + remaining_columns
+        else:
+            data = standardise_values(data)
+
+    return data
 
 def Load_NeuralNetwork(variable_data, result_data, learning_rate, size_hidden, size_output):
     neural_network = NeuralNetwork(variable_data, result_data, learning_rate, size_hidden, size_output)
